@@ -47,3 +47,14 @@ defi-cli withdraw 5
 defi-cli info
 defi-cli crystallize
 ```
+
+### 어드민 페이지 실행
+
+관리 대시보드에 접속하려면 `ADMIN_PASS` 환경변수를 설정한 뒤 `defi-admin` 명령을 실행합니다.
+
+```bash
+export ADMIN_PASS=비밀번호
+defi-admin
+```
+
+기본 사용자 이름은 `admin`이며 `ADMIN_USER` 변수로 변경 가능합니다.

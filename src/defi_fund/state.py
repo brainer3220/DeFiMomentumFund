@@ -1,28 +1,58 @@
-import json
+"""State management backed by PostgreSQL."""
+
 import os
-from pathlib import Path
 from typing import Dict
 
-from .config import settings
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 DEFAULT_STATE = {"total_assets": 0.0, "total_shares": 0.0}
 
 
-def get_state_file() -> Path:
-    """Return the path to the state file (evaluated lazily)."""
-    return Path(os.getenv("FUND_STATE_FILE", str(settings.BASE_DIR / "fund_state.json")))
+def get_connection():
+    """Return a new PostgreSQL connection using ``DATABASE_URL`` env var."""
+    dsn = os.getenv(
+        "DATABASE_URL", "postgresql://postgres:postgres@127.0.0.1/postgres"
+    )
+    return psycopg2.connect(dsn)
+
+
+def _init_table(cur) -> None:
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS fund_state (
+            id INTEGER PRIMARY KEY,
+            total_assets DOUBLE PRECISION NOT NULL,
+            total_shares DOUBLE PRECISION NOT NULL
+        )
+        """
+    )
 
 
 def load_state() -> Dict[str, float]:
-    state_file = get_state_file()
-    if state_file.exists():
-        with open(state_file) as f:
-            return json.load(f)
-    return DEFAULT_STATE.copy()
+    with get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        _init_table(cur)
+        cur.execute("SELECT total_assets, total_shares FROM fund_state WHERE id=1")
+        row = cur.fetchone()
+        if row is None:
+            cur.execute(
+                "INSERT INTO fund_state (id, total_assets, total_shares) VALUES (1, %s, %s)",
+                (DEFAULT_STATE["total_assets"], DEFAULT_STATE["total_shares"]),
+            )
+            return DEFAULT_STATE.copy()
+        return {"total_assets": row["total_assets"], "total_shares": row["total_shares"]}
 
 
 def save_state(state: Dict[str, float]) -> None:
-    state_file = get_state_file()
-    state_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(state_file, "w") as f:
-        json.dump(state, f)
+    with get_connection() as conn, conn.cursor() as cur:
+        _init_table(cur)
+        cur.execute(
+            """
+            INSERT INTO fund_state (id, total_assets, total_shares)
+            VALUES (1, %s, %s)
+            ON CONFLICT (id) DO UPDATE
+              SET total_assets = EXCLUDED.total_assets,
+                  total_shares = EXCLUDED.total_shares
+            """,
+            (state["total_assets"], state["total_shares"]),
+        )

@@ -1,11 +1,17 @@
 import os
+import psycopg2
 import pytest
 from defi_fund.cli.app import deposit, withdraw
 from defi_fund.state import load_state
 
-def test_deposit_and_withdraw(tmp_path, capsys, monkeypatch):
-    state_file = tmp_path / "state.json"
-    monkeypatch.setenv("FUND_STATE_FILE", str(state_file))
+def test_deposit_and_withdraw(monkeypatch, capsys):
+    dsn = os.getenv(
+        "TEST_DATABASE_URL",
+        "postgresql://postgres:postgres@127.0.0.1/postgres",
+    )
+    monkeypatch.setenv("DATABASE_URL", dsn)
+    with psycopg2.connect(dsn) as conn, conn.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS fund_state")
 
     deposit(10.0)
     withdraw(5.0)

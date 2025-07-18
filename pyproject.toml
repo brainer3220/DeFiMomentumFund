@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "defi_fund"
+version = "0.1.0"
+description = "Chain-agnostic DeFi Fund baseline"
+authors = ["진상현 <sang.hyun_jin@icloud.com>"]
+readme = "README.md"
+packages = [{ include = "defi_fund", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+web3 = "^6.17.0"
+typer = "^0.12.3"
+python-dotenv = "^1.0.0"
+loguru = "^0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+mypy = "^1.10.0"
+
+[tool.poetry.scripts]
+defi-cli = "defi_fund.cli.app:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

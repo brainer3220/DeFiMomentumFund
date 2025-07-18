@@ -35,7 +35,6 @@ def test_admin_page(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", dsn)
     monkeypatch.setenv("ADMIN_PASS", "secret")
     reset_db(dsn)
-
     deposit(1.0)
 
     client = TestClient(admin_app)

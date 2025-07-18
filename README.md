@@ -22,15 +22,25 @@
 ```
 
 ## 사용 방법
-1. Poetry 설치
+1. **UV 설치**
    ```bash
-   pipx install poetry
+   pipx install uv
    ```
-2. 의존성 설치
+2. **의존성 설치 및 가상환경 생성**
    ```bash
-   poetry install
+   uv venv
+   uv pip install -e .[dev]
    ```
-3. CLI 실행
+3. **CLI 실행**
    ```bash
-   poetry run defi-cli --help
+   source .venv/bin/activate
+   defi-cli --help
    ```
+
+### 예시 사용법
+```bash
+# 10 토큰 예치 후 5 지분 상환
+defi-cli deposit 10
+defi-cli withdraw 5
+defi-cli info
+```

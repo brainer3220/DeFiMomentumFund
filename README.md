@@ -2,6 +2,8 @@
 
 초기 DeFi 펀드 Python 프로젝트 스캐폴드입니다.
 
+상세한 펀드 설계와 수수료 구조는 [`docs/manual_trading_fund_design.md`](docs/manual_trading_fund_design.md) 문서를 참고하세요.
+
 ## 구조
 ```
 .
@@ -43,4 +45,5 @@
 defi-cli deposit 10
 defi-cli withdraw 5
 defi-cli info
+defi-cli crystallize
 ```

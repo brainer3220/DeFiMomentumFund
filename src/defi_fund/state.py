@@ -1,11 +1,19 @@
 import json
 import os
+import time
 from pathlib import Path
 from typing import Dict
 
 from .config import settings
 
-DEFAULT_STATE = {"total_assets": 0.0, "total_shares": 0.0}
+DEFAULT_STATE = {
+    "total_assets": 0.0,
+    "total_shares": 0.0,
+    "mgmt_acc": 0.0,
+    "perf_acc": 0.0,
+    "hwm": 1.0,
+    "last_update": 0.0,
+}
 
 
 def get_state_file() -> Path:
@@ -17,8 +25,17 @@ def load_state() -> Dict[str, float]:
     state_file = get_state_file()
     if state_file.exists():
         with open(state_file) as f:
-            return json.load(f)
-    return DEFAULT_STATE.copy()
+            state = json.load(f)
+    else:
+        state = DEFAULT_STATE.copy()
+
+    # ensure all keys exist
+    for k, v in DEFAULT_STATE.items():
+        state.setdefault(k, v)
+
+    if state["last_update"] == 0.0:
+        state["last_update"] = time.time()
+    return state
 
 
 def save_state(state: Dict[str, float]) -> None:

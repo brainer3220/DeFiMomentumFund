@@ -26,7 +26,7 @@ pipx install uv
 
 # Create virtual environment and install dependencies
 uv venv
-uv pip install -e .[dev]
+uv pip install -e '.[dev]'
 
 # Activate virtual environment (Windows)
 .venv\Scripts\activate

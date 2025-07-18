@@ -2,10 +2,12 @@ import os
 import pytest
 from defi_fund.cli.app import deposit, withdraw
 from defi_fund.state import load_state
+import time
 
 def test_deposit_and_withdraw(tmp_path, capsys, monkeypatch):
     state_file = tmp_path / "state.json"
     monkeypatch.setenv("FUND_STATE_FILE", str(state_file))
+    monkeypatch.setattr(time, "time", lambda: 0)
 
     deposit(10.0)
     withdraw(5.0)

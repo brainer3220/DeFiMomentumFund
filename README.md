@@ -31,7 +31,7 @@
 2. **의존성 설치 및 가상환경 생성**
    ```bash
    uv venv
-   uv pip install -e .[dev]
+   uv pip install -e '.[dev]'
    ```
 3. **CLI 실행**
    ```bash

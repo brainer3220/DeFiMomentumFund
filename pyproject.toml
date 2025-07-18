@@ -1,27 +1,55 @@
-[tool.poetry]
-name = "defi_fund"
-version = "0.1.0"
-description = "Chain-agnostic DeFi Fund baseline"
-authors = ["진상현 <sang.hyun_jin@icloud.com>"]
-readme = "README.md"
-packages = [{ include = "defi_fund", from = "src" }]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-web3 = "^6.17.0"
-typer = "^0.12.3"
-python-dotenv = "^1.0.0"
-loguru = "^0.7.2"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.0"
-black = "^24.4.2"
-isort = "^5.13.2"
-mypy = "^1.10.0"
-
-[tool.poetry.scripts]
-defi-cli = "defi_fund.cli.app:app"
+##############################
+#   pyproject.toml (PEP 621) #
+##############################
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires      = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ------------------------------------------------------------------
+[project]
+name            = "defi-fund"
+version         = "0.1.0"
+description     = "Chain‑agnostic DeFi Fund baseline"
+readme          = "README.md"
+requires-python = ">=3.10"
+authors         = [
+  { name = "진상현", email = "sang.hyun_jin@icloud.com" }
+]
+
+# 주요 런타임 의존성 -------------------------------------------------
+dependencies = [
+  "web3>=6.17.0",
+  "typer>=0.12.3",
+  "python-dotenv>=1.0.0",
+  "loguru>=0.7.2"
+]
+
+# 선택(개발) 의존성 --------------------------------------------------
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0",
+  "black>=24.4.2",
+  "isort>=5.13.2",
+  "mypy>=1.10.0"
+]
+
+# CLI 엔트리포인트 ---------------------------------------------------
+[project.scripts]
+defi-cli = "defi_fund.cli.app:app"
+
+# ------------------------------------------------------------------
+# src 레이아웃을 setuptools에 알림
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages    = ["defi_fund"]
+
+#####################################################################
+# 선택 사항: 코드 스타일·툴 설정을 여기 추가할 수 있습니다.
+#
+# [tool.black]
+# line-length = 100
+#
+# [tool.isort]
+# profile = "black"
+#####################################################################

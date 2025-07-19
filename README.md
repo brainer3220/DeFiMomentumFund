@@ -7,6 +7,7 @@ Documentation is available in English and Korean:
 - [한국어 문서](docs/overview_ko.md)
 - Detailed design notes: [docs/manual_trading_fund_design.md](docs/manual_trading_fund_design.md)
 - Vault specification (KO): [docs/vault_spec_ko.md](docs/vault_spec_ko.md)
+- Logic diagrams: [docs/logic_diagrams.md](docs/logic_diagrams.md)
 
 ## Quick Start
 1. **Install `uv`**

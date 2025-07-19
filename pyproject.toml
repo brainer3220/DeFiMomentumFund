@@ -41,6 +41,7 @@ dev = [
 [project.scripts]
 defi-cli = "defi_fund.cli.app:app"
 defi-admin = "defi_fund.web.admin:main"
+defi-web = "defi_fund.web.frontend:main"
 
 # ------------------------------------------------------------------
 # src 레이아웃을 setuptools에 알림

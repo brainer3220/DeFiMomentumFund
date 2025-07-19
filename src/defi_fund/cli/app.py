@@ -1,7 +1,8 @@
 import typer
 from loguru import logger
 from defi_fund.state import load_state, save_state
-from defi_fund.accounting import update_fees
+from defi_fund.accounting import SPREAD_RATE, update_fees
+from defi_fund.txlog import log_transaction
 
 app = typer.Typer(help="DeFi Fund CLI")
 
@@ -11,12 +12,17 @@ def deposit(amount: float):
     """예치 기능: 자산을 예치하고 지분을 발행합니다."""
     state = load_state()
     update_fees(state)
+    fee = amount * SPREAD_RATE
+    net_amount = amount - fee
     price = state["total_assets"] / state["total_shares"] if state["total_shares"] > 0 else 1.0
-    new_shares = amount / price
-    state["total_assets"] += amount
+    new_shares = net_amount / price
+    state["total_assets"] += net_amount
     state["total_shares"] += new_shares
     save_state(state)
-    typer.echo(f"Deposited {amount} tokens -> {new_shares:.4f} shares")
+    log_transaction("deposit", amount)
+    typer.echo(
+        f"Deposited {amount} tokens -> {new_shares:.4f} shares (fee {fee:.4f})"
+    )
 
 
 @app.command("withdraw")
@@ -29,10 +35,15 @@ def withdraw(shares: float):
         raise typer.Exit(code=1)
     price = state["total_assets"] / state["total_shares"] if state["total_shares"] > 0 else 1.0
     amount = shares * price
-    state["total_assets"] -= amount
+    fee = amount * SPREAD_RATE
+    net_amount = amount - fee
+    state["total_assets"] -= net_amount
     state["total_shares"] -= shares
     save_state(state)
-    typer.echo(f"Withdrew {shares} shares -> {amount:.4f} tokens")
+    log_transaction("withdraw", shares)
+    typer.echo(
+        f"Withdrew {shares} shares -> {net_amount:.4f} tokens (fee {fee:.4f})"
+    )
 
 
 @app.command("crystallize")

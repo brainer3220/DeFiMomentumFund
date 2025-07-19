@@ -4,6 +4,7 @@ from typing import Dict
 YEAR_SECONDS = 365 * 24 * 60 * 60
 MGMT_RATE = 0.02  # 2% annual management fee
 PERF_RATE = 0.20  # 20% performance fee
+SPREAD_RATE = 0.001  # 0.10% deposit/withdraw spread
 
 
 def accrue_management_fee(state: Dict[str, float], timestamp: float | None = None) -> None:

@@ -3,6 +3,8 @@ from loguru import logger
 from defi_fund.state import load_state, save_state
 from defi_fund.accounting import SPREAD_RATE, update_fees
 from defi_fund.txlog import log_transaction
+from defi_fund.oracle import get_price
+from defi_fund.config import settings
 
 app = typer.Typer(help="DeFi Fund CLI")
 
@@ -14,8 +16,10 @@ def deposit(amount: float):
     update_fees(state)
     fee = amount * SPREAD_RATE
     net_amount = amount - fee
-    price = state["total_assets"] / state["total_shares"] if state["total_shares"] > 0 else 1.0
-    new_shares = net_amount / price
+    asset_price = get_price(settings.DEPOSIT_ASSET)
+    nav_usd = state["total_assets"] * asset_price
+    share_price = nav_usd / state["total_shares"] if state["total_shares"] > 0 else asset_price
+    new_shares = (net_amount * asset_price) / share_price
     state["total_assets"] += net_amount
     state["total_shares"] += new_shares
     save_state(state)
@@ -33,8 +37,11 @@ def withdraw(shares: float):
     if shares > state["total_shares"]:
         typer.echo("Not enough shares", err=True)
         raise typer.Exit(code=1)
-    price = state["total_assets"] / state["total_shares"] if state["total_shares"] > 0 else 1.0
-    amount = shares * price
+    asset_price = get_price(settings.DEPOSIT_ASSET)
+    nav_usd = state["total_assets"] * asset_price
+    share_price = nav_usd / state["total_shares"] if state["total_shares"] > 0 else asset_price
+    amount_usd = shares * share_price
+    amount = amount_usd / asset_price
     fee = amount * SPREAD_RATE
     net_amount = amount - fee
     state["total_assets"] -= net_amount
@@ -60,7 +67,9 @@ def info():
     """펀드 정보 조회."""
     state = load_state()
     update_fees(state)
-    price = state["total_assets"] / state["total_shares"] if state["total_shares"] > 0 else 1.0
+    asset_price = get_price(settings.DEPOSIT_ASSET)
+    nav_usd = state["total_assets"] * asset_price
+    price = nav_usd / state["total_shares"] if state["total_shares"] > 0 else asset_price
     typer.echo(
         f"Assets: {state['total_assets']:.4f}, Shares: {state['total_shares']:.4f}, Price: {price:.4f}, "
         f"MgmtAcc: {state['mgmt_acc']:.4f}, PerfAcc: {state['perf_acc']:.4f}, HWM: {state['hwm']:.4f}"

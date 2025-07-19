@@ -34,6 +34,12 @@ contract Vault is ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeabl
     uint256 public feeReserves; // accumulated spreads
     uint256 public gasAcc; // available gas reimbursement
 
+    mapping(address => bool) public approvedTargets;
+    mapping(bytes4 => bool) public blockedFunctions;
+
+    event TargetApproved(address indexed target, bool approved);
+    event FunctionBlocked(bytes4 indexed selector, bool blocked);
+
     /// @notice Initialize the vault
     /// @param asset_ Token accepted for deposits
     /// @param manager Address receiving fees and able to execute trades
@@ -99,6 +105,12 @@ contract Vault is ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeabl
         onlyRole(MANAGER_ROLE)
         returns (bytes memory)
     {
+        require(approvedTargets[target], "target not approved");
+        bytes4 selector;
+        assembly {
+            selector := calldataload(data.offset)
+        }
+        require(!blockedFunctions[selector], "function blocked");
         (bool ok, bytes memory ret) = target.call(data);
         require(ok, "trade failed");
         return ret;
@@ -112,6 +124,18 @@ contract Vault is ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeabl
     /// @notice Unpause vault
     function unpauseVault() external onlyRole(GUARDIAN_ROLE) {
         _unpause();
+    }
+
+    /// @notice Approve or revoke a target contract for trading
+    function setApprovedTarget(address target, bool approved) external onlyRole(GUARDIAN_ROLE) {
+        approvedTargets[target] = approved;
+        emit TargetApproved(target, approved);
+    }
+
+    /// @notice Block or allow a specific function selector
+    function setBlockedFunction(bytes4 selector, bool blocked) external onlyRole(GUARDIAN_ROLE) {
+        blockedFunctions[selector] = blocked;
+        emit FunctionBlocked(selector, blocked);
     }
 
     /// @dev Required for UUPS upgrades, restricted to guardian

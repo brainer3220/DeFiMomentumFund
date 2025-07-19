@@ -13,7 +13,8 @@
 │   ├── config/
 │   │   └── settings.py
 │   ├── contracts/
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   └── Vault.sol
 │   └── cli/
 │       └── app.py
 ├── tests/

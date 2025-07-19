@@ -8,7 +8,9 @@ import time
 
 def test_deposit_and_withdraw(tmp_path, capsys, monkeypatch):
     state_file = tmp_path / "state.json"
+    tx_file = tmp_path / "tx.csv"
     monkeypatch.setenv("FUND_STATE_FILE", str(state_file))
+    monkeypatch.setenv("FUND_TX_LOG", str(tx_file))
     monkeypatch.setattr(time, "time", lambda: 0)
 
     deposit(10.0)
@@ -17,13 +19,16 @@ def test_deposit_and_withdraw(tmp_path, capsys, monkeypatch):
     assert "Deposited" in out and "Withdrew" in out
 
     state = load_state()
-    assert state["total_assets"] == pytest.approx(5.0)
-    assert state["total_shares"] == pytest.approx(5.0)
+    assert state["total_assets"] == pytest.approx(4.995)
+    assert state["total_shares"] == pytest.approx(4.99)
+    assert tx_file.exists()
 
 
 def test_admin_page(tmp_path, monkeypatch):
     state_file = tmp_path / "state.json"
+    tx_file = tmp_path / "tx.csv"
     monkeypatch.setenv("FUND_STATE_FILE", str(state_file))
+    monkeypatch.setenv("FUND_TX_LOG", str(tx_file))
     monkeypatch.setenv("ADMIN_PASS", "secret")
     deposit(1.0)
 

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DeFi Fund Dashboard</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/javascript">
+    const e = React.createElement;
+    function App() {
+        const [state, setState] = React.useState(null);
+        const [amount, setAmount] = React.useState("");
+        const [shares, setShares] = React.useState("");
+        const refresh = () => fetch('/api/state').then(r=>r.json()).then(setState);
+        React.useEffect(refresh, []);
+        const doDeposit = () => {
+            fetch('/api/deposit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({amount:parseFloat(amount)})})
+                .then(refresh);
+        };
+        const doWithdraw = () => {
+            fetch('/api/withdraw', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({shares:parseFloat(shares)})})
+                .then(refresh);
+        };
+        if(!state) return e('div', null, 'Loading...');
+        return e('div', null,
+            e('h1', null, 'DeFi Fund Dashboard'),
+            e('p', null, `Assets: ${state.total_assets.toFixed(4)}`),
+            e('p', null, `Shares: ${state.total_shares.toFixed(4)}`),
+            e('p', null, `Share Price: ${state.share_price.toFixed(4)}`),
+            e('div', null,
+                e('input', {value: amount, onChange: ev => setAmount(ev.target.value), placeholder: 'amount'}),
+                e('button', {onClick: doDeposit}, 'Deposit')
+            ),
+            e('div', null,
+                e('input', {value: shares, onChange: ev => setShares(ev.target.value), placeholder: 'shares'}),
+                e('button', {onClick: doWithdraw}, 'Withdraw')
+            )
+        );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+    </script>
+</body>
+</html>

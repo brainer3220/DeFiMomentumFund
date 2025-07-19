@@ -1,28 +1,42 @@
-# Defi_fund Project Scaffold
+# DeFi Momentum Fund
 
-초기 DeFi 펀드 Python 프로젝트 스캐폴드입니다.
+This repository provides a minimal implementation of an on-chain fund vault written in Python. It issues ERC‑20 shares for deposits and allows a manager account to execute trades while assets remain in the vault. Fees and state are tracked locally for demonstration.
 
-상세한 펀드 설계와 수수료 구조는 [`docs/manual_trading_fund_design.md`](docs/manual_trading_fund_design.md) 문서를 참고하세요.
+Documentation is available in English and Korean:
+- [English overview](docs/overview_en.md)
+- [한국어 문서](docs/overview_ko.md)
+- Detailed design notes: [docs/manual_trading_fund_design.md](docs/manual_trading_fund_design.md)
 
-## 구조
+## Quick Start
+1. **Install `uv`**
+   ```bash
+   pipx install uv
+   ```
+2. **Create a virtual environment and install dependencies**
+   ```bash
+   uv venv
+   uv pip install -e '.[dev]'
+   ```
+3. **Run the CLI**
+   ```bash
+   source .venv/bin/activate
+   defi-cli --help
+   ```
+
+Example commands:
+```bash
+# Deposit 10 tokens and withdraw 5 shares
+defi-cli deposit 10
+defi-cli withdraw 5
 ```
-.
-├── src/defi_fund/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── config/
-│   │   └── settings.py
-│   ├── contracts/
-│   │   ├── __init__.py
-│   │   └── Vault.sol
-│   └── cli/
-│       └── app.py
-├── tests/
-│   └── test_basic.py
-├── pyproject.toml
-├── .gitignore
-└── .env.example
-```
+
+Set `WEB3_PROVIDER_URI` and `PRIVATE_KEY` in `.env` to connect your wallet. See `docs/overview_en.md` for details and risk warnings.
+
+---
+
+# DeFi 모멘텀 펀드
+
+이 저장소는 Python으로 작성된 간단한 DeFi 펀드 Vault 예제입니다. 예치 시 ERC-20 지분 토큰을 발행하고, 매니저가 Vault 내 자산을 이용해 거래할 수 있습니다. 자세한 내용은 위 문서 링크를 참고하세요.
 
 ## 사용 방법
 1. **UV 설치**
@@ -40,22 +54,11 @@
    defi-cli --help
    ```
 
-### 예시 사용법
+### 예시
 ```bash
 # 10 토큰 예치 후 5 지분 상환
 defi-cli deposit 10
 defi-cli withdraw 5
-defi-cli info
-defi-cli crystallize
 ```
 
-### 어드민 페이지 실행
-
-관리 대시보드에 접속하려면 `ADMIN_PASS` 환경변수를 설정한 뒤 `defi-admin` 명령을 실행합니다.
-
-```bash
-export ADMIN_PASS=비밀번호
-defi-admin
-```
-
-기본 사용자 이름은 `admin`이며 `ADMIN_USER` 변수로 변경 가능합니다.
+관리 페이지를 사용하려면 `ADMIN_PASS` 환경변수를 설정한 뒤 `defi-admin` 명령을 실행하십시오.
